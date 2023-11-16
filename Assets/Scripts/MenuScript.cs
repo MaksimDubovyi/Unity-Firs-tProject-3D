@@ -35,9 +35,20 @@ public class MenuScript : MonoBehaviour
     public static float cameraSensityvityX;
     public static float cameraSensityvityY;
     public static bool cameraInverseY;
+    public static int CountCoint;
+    public static int ToggleScoringPointst;
+    public static int IsToggleScoringPointst; //0=LightToggle 1=MediumToggle  2=HeavyToggle
+    public static Vector3 coinPosition;
+    public static Vector3 characterPosition;
+    public static Vector3 characterForward;
 
     [SerializeField] // якщо буде не активний обєкт то ми його не знайдемо без  [SerializeField]
     private GameObject PauseMenu;
+
+    [SerializeField] // якщо буде не активний обєкт то ми його не знайдемо без  [SerializeField]
+    private GameObject StepBlock;
+    [SerializeField] // якщо буде не активний обєкт то ми його не знайдемо без  [SerializeField]
+    private GameObject CompasArrow;
 
     [SerializeField]
     private Slider sensXSlider;
@@ -47,19 +58,44 @@ public class MenuScript : MonoBehaviour
     private Toggle invYToggle;
 
     [SerializeField]
+    private Toggle LightToggle;
+    [SerializeField]
+    private Toggle MediumToggle;
+    [SerializeField]
+    private Toggle HeavyToggle;
+
+    [SerializeField]
     private TMPro.TextMeshProUGUI clock;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI countStep;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI countCoint;
+   
+    [SerializeField]
+    private TMPro.TextMeshProUGUI scoringPoints;
+
+    [SerializeField]
+    private Image compasArrow;
 
     private float totalTime;
     private bool totalTimePause;
 
     void Start()
     {
-       OnCameraSensXSlider(sensXSlider.value);
+        OnCameraSensXSlider(sensXSlider.value);
         OnCameraSensYSlider(sensYSlider.value);
         OnCameraInverseToggle(invYToggle.isOn);
         PauseMenu.SetActive(!PauseMenu.activeInHierarchy);
         totalTime = 0;
         totalTimePause = true;
+
+
+        IsToggleScoringPointst = 0;
+        LightToggle.isOn = true;
+        MediumToggle.isOn = false;
+        HeavyToggle.isOn = false;
     }
 
  
@@ -81,12 +117,26 @@ public class MenuScript : MonoBehaviour
 
     private void LateUpdate()
     {
+        IsToggle();
         int time = (int)totalTime;
         int hour = time / 3600;
         int minute = (time % 3600) / 60;
         int second = time % 60;
 
         clock.text = $"{hour.ToString("00")}:{minute.ToString("00")}:{second.ToString("00")}";
+
+        compasArrow.transform.eulerAngles= new Vector3(0, 0,
+            Vector3.SignedAngle(characterForward, coinPosition-characterPosition, Vector3.down));
+
+     
+        float distance = Vector3.Distance(coinPosition, characterPosition);
+        int distanceInt = (int)distance;
+        CountStepColor(distanceInt);
+
+        countStep.text = distanceInt.ToString();
+
+        countCoint.text=CountCoint.ToString();
+        scoringPoints.text=ToggleScoringPointst.ToString();
     }
 
     public void OnCameraInverseToggle(Boolean value)
@@ -126,10 +176,51 @@ public class MenuScript : MonoBehaviour
         #endif
     }
 
-    
-    private void TimeOnOff()
+    private void CountStepColor(int distanceInt)
     {
-
+        if (distanceInt > 50)
+        {
+            countStep.color = Color.red;
+        }
+        else if (distanceInt < 50)
+        {
+            countStep.color = Color.white;
+        }
+        if (distanceInt < 10)
+        {
+            countStep.color = Color.green;
+        }
     }
+
+    public void IsToggle()
+    {
+        if (LightToggle.isOn)
+            IsToggleScoringPointst = 0;
+        else if (MediumToggle.isOn)
+            IsToggleScoringPointst = 1;
+        else if (HeavyToggle.isOn)
+            IsToggleScoringPointst = 2;
+    }
+    public void IsToggleShowMenu()
+    {
+        if (LightToggle.isOn)
+        {
+            StepBlock.SetActive(true);
+            CompasArrow.SetActive(true);
+        }
+        if (MediumToggle.isOn)
+        {
+            StepBlock.SetActive(false);
+            CompasArrow.SetActive(true);
+        }
+        if (HeavyToggle.isOn)
+        {
+
+            StepBlock.SetActive(false);
+            CompasArrow.SetActive(false);
+        }
+    }
+
+
 }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CharacterScript : MonoBehaviour
 {
+
     [SerializeField]
     private Camera mainCamera;
     private CharacterController characterController;
@@ -123,6 +124,10 @@ public class CharacterScript : MonoBehaviour
                 {
                     moveState = 6; //Jump
                 }
+                if (Input.GetKeyDown(KeyCode.C))
+                {
+                    moveState = 10; // Нажата левая кнопка мыши (Mouse0)
+                }
             }
             
         }
@@ -135,6 +140,7 @@ public class CharacterScript : MonoBehaviour
         {
             moveState = 12; // Нажата левая кнопка мыши (Mouse0)
         }
+     
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
             moveDirection *= runFactor;
@@ -145,6 +151,9 @@ public class CharacterScript : MonoBehaviour
 
         animator.SetInteger("MoveState", moveState); //задаємо стан аніматора він має обрати кліп
 
+        // Для компасу
+        MenuScript.characterPosition=transform.position;
+        MenuScript.characterForward=transform.forward;
        
     }
 
@@ -155,4 +164,5 @@ public class CharacterScript : MonoBehaviour
             0,
             mainCamera.transform.forward.z).normalized;
     }
+
 }

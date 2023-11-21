@@ -9,6 +9,7 @@ public class CoinScript : MonoBehaviour
     private GameObject coinPrefab;
     private Animator animator;
 
+    private AudioSource coinSound;
 
     private float coinSpuwnHeight; //Висота появи над зимлею
   
@@ -16,8 +17,9 @@ public class CoinScript : MonoBehaviour
     {
        animator=GetComponent<Animator>();
 
-     
-        coinSpuwnHeight= this.transform.position.y- //висота позиції ассету мінус
+        coinSound = GetComponent<AudioSource>();
+
+        coinSpuwnHeight = this.transform.position.y- //висота позиції ассету мінус
             //  Висота Землі у точці розміщення this (монети)
             Terrain.activeTerrain.SampleHeight(this.transform.position);
     }
@@ -32,6 +34,9 @@ public class CoinScript : MonoBehaviour
     {
         if(other.name.Equals("Joni (1)")&& animator.GetBool("IsCaught" )== false)
         {
+
+        
+
             var newCoin = GameObject.Instantiate(coinPrefab);
             //Визначаємо позицію нової монети:
             //1. Не ближче за 10 одиниць від відстані до персонажа (попереднього положення)
@@ -45,7 +50,7 @@ public class CoinScript : MonoBehaviour
                 newPosition.x += Random.Range(-15f, 15f);
                 newPosition.z += Random.Range(-15f, 15f);
 
-
+                new Vector3(0, 0, 0);
             } while (Vector3.Distance(newPosition, transform.position) < 10
                         || (newPosition.x < 100 || newPosition.x > 900)
                         || (newPosition.z < 100 || newPosition.z > 900));
@@ -53,8 +58,7 @@ public class CoinScript : MonoBehaviour
             newPosition.y = coinSpuwnHeight + Terrain.activeTerrain.SampleHeight(newPosition);
 
             newCoin.transform.position = newPosition;
-
-         
+            coinSound.Play();
             animator.SetBool("IsCaught", true);
         }
         Debug.Log(other.name);
@@ -62,13 +66,15 @@ public class CoinScript : MonoBehaviour
 
     public void OnDisapearEnds() // подія для  її запуску з аніматора (наша назву можемо задавати любу)
     {
-       GameObject.Destroy(this.gameObject);
+
+        coinSound.Stop();
        MenuScript.CountCoint++;
         if (MenuScript.IsToggleScoringPointst == 0)
             MenuScript.ToggleScoringPointst++;
         else if (MenuScript.IsToggleScoringPointst == 1)
             MenuScript.ToggleScoringPointst+=2;
         else if (MenuScript.IsToggleScoringPointst == 2)
-            MenuScript.ToggleScoringPointst += 3;
+            MenuScript.ToggleScoringPointst += 3; 
+        GameObject.Destroy(this.gameObject);
     }
 }

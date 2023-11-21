@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CharacterScript : MonoBehaviour
 {
+    //public bool booserBonus;
 
     [SerializeField]
     private Camera mainCamera;
@@ -19,6 +20,7 @@ public class CharacterScript : MonoBehaviour
 
     float jspeed = 0;
 
+    private bool isGrounded = false;
     void Start()
     {
         characterController=this.GetComponent<CharacterController>();
@@ -29,7 +31,7 @@ public class CharacterScript : MonoBehaviour
     void Update()
     {
 
-
+     
         float fx = Input.GetAxis("Horizontal");     //ліво право
         float fz = Input.GetAxis("Vertical");       //перед  назад
 
@@ -40,10 +42,6 @@ public class CharacterScript : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 jspeed = jumpSpeed;
-            }
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                
             }
         }
         jspeed += gravity * Time.deltaTime * 6;
@@ -63,89 +61,102 @@ public class CharacterScript : MonoBehaviour
 
         //--stert---------------Animation
         int moveState = 0;
-       
-        if (Mathf.Abs(fx) > Mathf.Abs(fz))//перевірка вперед назад чи посторонам  (помодулю )
-        {
-            if (fx != 0)
-            {
-                if (fx < 0)
-                {
-                    moveState = 3; // Walk вліво
-                }
-                else
-                {
-                    moveState = 4; //Walk вправо
-                }
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    moveState = 9; //Jump
-                }
-            }
-            else
-            {
-                moveState = 0;
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    moveState = 6; //Jump
-                }
 
-            }
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            moveState = 10;
+
         }
         else
         {
-            if (fz != 0)
+            if (Mathf.Abs(fx) > Mathf.Abs(fz))//перевірка вперед назад чи посторонам  (помодулю )
             {
-                if (fz < 0)
+                if (fx != 0)
                 {
-                    moveState = 5; // Walk назад
+                    if (fx < 0)
+                    {
+                        moveState = 3; // Walk вліво
+                    }
+                    else
+                    {
+                        moveState = 4; //Walk вправо
+                    }
                     if (Input.GetKeyDown(KeyCode.Space))
                     {
-                        moveState = 8; //Jump
+                        moveState = 9; //Jump
+                    }
+                    if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                    {
+                        moveDirection *= runFactor;
+                        moveState = 2; //Run
                     }
                 }
                 else
                 {
-                    moveState = 1; //Walk вперед
-                    if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-                    {
-                        // moveDirection *= runFactor;
-                        moveState = 2; //Run
-                    }
+                    moveState = 0;
                     if (Input.GetKeyDown(KeyCode.Space))
                     {
-                        moveState = 7; //Jump
+                        moveState = 6; //Jump
                     }
+
                 }
             }
             else
             {
-                moveState = 0; 
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (fz != 0)
                 {
-                    moveState = 6; //Jump
+                    if (fz < 0)
+                    {
+                        moveState = 5; // Walk назад
+                        if (Input.GetKeyDown(KeyCode.Space))
+                        {
+                            moveState = 8; //Jump
+                        }
+                        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                        {
+                            moveDirection *= runFactor;
+                            moveState = 2; //Run
+                        }
+                    }
+                    else
+                    {
+                        moveState = 1; //Walk вперед
+                        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                        {
+                            moveDirection *= runFactor;
+                            moveState = 2; //Run
+                        }
+                        if (Input.GetKeyDown(KeyCode.Space))
+                        {
+                            moveState = 7; //Jump
+                        }
+                    }
                 }
-                if (Input.GetKeyDown(KeyCode.C))
+                else
                 {
-                    moveState = 10; // Нажата левая кнопка мыши (Mouse0)
-                }
-            }
-            
-        }
+                    moveState = 0;
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        moveState = 6; //Jump
+                    }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            moveState = 11; // Нажата левая кнопка мыши (Mouse0)
+                }
+
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                moveState = 11; // Нажата левая кнопка мыши (Mouse0)
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                moveState = 12; // Нажата левая кнопка мыши (Mouse0)
+            }
         }
-        if (Input.GetMouseButtonDown(1))
-        {
-            moveState = 12; // Нажата левая кнопка мыши (Mouse0)
-        }
-     
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-        {
-            moveDirection *= runFactor;
-            //   moveState = 2; //Run
-        }
+ 
+        //if(isGrounded) 
+        //{ moveState = 13; }
+
         //-----exit------------Animation
         characterController.Move(moveDirection); //делегуємо персонажу координати 
 
